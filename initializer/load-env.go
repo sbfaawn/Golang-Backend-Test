@@ -11,6 +11,9 @@ type Config struct {
 	DBName         string `mapstructure:"POSTGRES_DB"`
 	DBPort         string `mapstructure:"POSTGRES_PORT"`
 	ServerPort     string `mapstructure:"PORT"`
+	RedisAddress   string `mapstructure:"REDIS_ADDRESS"`
+	RedisPassword  string `mapstructure:"REDIS_PASSWORD"`
+	RedisDBNum     int    `mapstructure:"REDIS_DB_NUMBER"`
 }
 
 func LoadConfig(path string) (config Config, err error) {
