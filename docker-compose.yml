@@ -1,12 +1,27 @@
+version: '3.8'
 services:
-  postgres:
-    image: postgres
-    container_name: postgres
+#  postgres:
+#    image: postgres:latest
+#    container_name: postgres
+#    ports:
+#      - 5432:5432
+#    env_file:
+#      - ./app.env
+#    volumes:
+#      - postgres:/var/lib/postgresql/data
+#volumes:
+#  postgres:
+
+
+  redis-container:
+    container_name: redis-container
+    image: redis:latest
+    restart: always
     ports:
-      - 6500:5432
-    env_file:
-      - ./app.env
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - redis-container:/data
 volumes:
-  postgres:
+  redis-container:
+    driver: local

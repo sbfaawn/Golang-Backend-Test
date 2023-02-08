@@ -7,6 +7,8 @@ import (
 	"log"
 )
 
+var ctx = context.Background()
+
 func init() {
 	config, err := initializers.LoadConfig(".")
 	if err != nil {
@@ -17,8 +19,10 @@ func init() {
 }
 
 func main() {
-	ctx := context.Background()
-	cmd := initializers.Client.Set(ctx, "hello", "world", 0)
+	err := initializers.Client.Set(initializers.Ctx, "key", "value", 0).Err()
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	fmt.Println(cmd.Result())
+	fmt.Println("Success")
 }
