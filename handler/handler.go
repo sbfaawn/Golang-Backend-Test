@@ -14,25 +14,7 @@ func HealthCheckHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func DetailHandler(c echo.Context) error {
-	response := response2.Response{Message: "Get Endpoint is Called"}
-	return c.JSON(http.StatusOK, response)
-}
-
-func ListHandler(c echo.Context) error {
-	response := []struct {
-		Data   string `json:"data"`
-		IsGood bool   `json:"isGood"`
-	}{
-		{"data1", true},
-		{"data2", true},
-		{"data3", false},
-		{"data4", true},
-	}
-
-	return c.JSON(http.StatusOK, response)
-}
-
+// /
 func CreateUser(c echo.Context) error {
 	o := new(request.User)
 	if err := c.Bind(o); err != nil {
@@ -89,6 +71,56 @@ func CreateOrderHistory(c echo.Context) error {
 		Data:    o,
 	}
 
+	return c.JSON(http.StatusOK, response)
+}
+
+///
+
+func ListUsers(c echo.Context) error {
+	users, err := service.GetUsers()
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to Retrieve data",
+		Data:    users,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func ListOrderItems(c echo.Context) error {
+	orderItems, err := service.GetOrderItems()
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to Retrieve data",
+		Data:    orderItems,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func ListOrderHistories(c echo.Context) error {
+	orderHistories, err := service.GetOrderHistories()
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to Retrieve data",
+		Data:    orderHistories,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+// /
+func DetailHandler(c echo.Context) error {
+	response := response2.Response{Message: "Get Endpoint is Called"}
 	return c.JSON(http.StatusOK, response)
 }
 

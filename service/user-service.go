@@ -36,14 +36,25 @@ func InsertUser(user *request.User) error {
 	return nil
 }
 
-func GetUserById(userId *int) error {
+func GetUserById(userId *int) (entity.User, error) {
 	var user entity.User
 	err := initializers.DB.Where("deleted_at IS NULL").First(&user, userId).Error
 
 	if err != nil {
-		return err
+		return user, err
 	}
 	fmt.Println(user)
 
-	return nil
+	return user, nil
+}
+
+func GetUsers() ([]entity.User, error) {
+	var users []entity.User
+	err := initializers.DB.Where("deleted_at IS NULL").Find(&users).Error
+
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
 }

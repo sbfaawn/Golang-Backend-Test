@@ -26,11 +26,17 @@ func NewRouter() *echo.Echo {
 
 	router := e.Group("/api")
 	router.GET("/health-check", handler.HealthCheckHandler)
-	router.GET("/list", handler.ListHandler)
-	router.GET("/detail", handler.DetailHandler)
+	// create endpoint
 	router.POST("/create-user", handler.CreateUser)
 	router.POST("/create-order-item", handler.CreateOrderItem)
 	router.POST("/create-order-history", handler.CreateOrderHistory)
+	// list endpoint
+	router.GET("/list-user", handler.ListUsers)
+	router.GET("/list-order-item", handler.ListOrderItems)
+	router.GET("/list-order-history", handler.ListOrderHistories)
+	//
+	router.GET("/detail", handler.DetailHandler)
+
 	router.PUT("/update", handler.UpdateHandler)
 	router.DELETE("/delete", handler.DeleteHandler)
 

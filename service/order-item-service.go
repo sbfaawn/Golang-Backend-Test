@@ -48,3 +48,14 @@ func GetOrderItemById(orderItemId *int) error {
 
 	return nil
 }
+
+func GetOrderItems() ([]entity.OrderItem, error) {
+	var orderItems []entity.OrderItem
+	err := initializers.DB.Where("deleted_at IS NULL").Find(&orderItems).Error
+
+	if err != nil {
+		return orderItems, err
+	}
+
+	return orderItems, nil
+}
