@@ -4,7 +4,9 @@ import (
 	"Golang-Backend-Test/entity"
 	initializers "Golang-Backend-Test/initializer"
 	"Golang-Backend-Test/model/request"
+	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -57,13 +59,34 @@ func GetOrderHistories() (OrderHistoryJoin, error) {
 }
 
 func GetOrderHistoriesById(id *int) (OrderHistoryJoin, error) {
+	cache, err2 := initializers.Client.Get(initializers.Ctx, "orderHistory_"+strconv.Itoa(*id)).Result()
+	if err2 == nil {
+		fmt.Println("Get From Cache")
+		orderHistoryJoin := OrderHistoryJoin{}
+		err := json.Unmarshal([]byte(cache), &orderHistoryJoin)
+		if err != nil {
+			return orderHistoryJoin, err
+		}
+
+		return orderHistoryJoin, nil
+	}
+
 	var result OrderHistoryJoin
 
 	err := initializers.DB.Table("order_histories").Where("order_histories.id = ?", id).Where("users.deleted_at IS NULL").Where("order_items.deleted_at IS NULL").Select("users.full_name, users.first_order, order_items.name, order_items.price, order_items.expired_at, order_histories.description").Joins("JOIN order_items ON order_histories.order_item_id = order_items.id").Joins("JOIN users ON order_histories.user_id = users.id").Scan(&result).Error
-	fmt.Println(result)
-
 	if err != nil {
 		return result, err
+	}
+
+	fmt.Println(result)
+	marshal, err2 := json.Marshal(result)
+	if err2 != nil {
+		return result, err2
+	}
+
+	err2 = initializers.Client.Set(initializers.Ctx, "orderHistory_"+strconv.Itoa(*id), string(marshal), 30*time.Minute).Err()
+	if err2 != nil {
+		return result, err2
 	}
 
 	return result, nil

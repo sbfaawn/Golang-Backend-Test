@@ -188,7 +188,21 @@ func UpdateHandler(c echo.Context) error {
 
 // /
 func DeleteUser(c echo.Context) error {
-	response := response2.Response{Message: "Delete Endpoint is Called"}
+	paramId := c.QueryParam("id")
+	idInt, err := strconv.Atoi(paramId)
+	if err != nil {
+		return err
+	}
+
+	err = service.SoftDeleteUser(&idInt)
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to Delete data with Id " + paramId,
+		Data:    nil,
+	}
 	return c.JSON(http.StatusOK, response)
 }
 

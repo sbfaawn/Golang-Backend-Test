@@ -5,7 +5,10 @@ import (
 	"Golang-Backend-Test/helper"
 	initializers "Golang-Backend-Test/initializer"
 	"Golang-Backend-Test/model/request"
+	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
 )
 
 func InsertOrderItem(order *request.OrderItem) error {
@@ -38,6 +41,18 @@ func InsertOrderItem(order *request.OrderItem) error {
 }
 
 func GetOrderItemById(orderItemId *int) (entity.OrderItem, error) {
+	result, err2 := initializers.Client.Get(initializers.Ctx, "orderItem_"+strconv.Itoa(*orderItemId)).Result()
+	if err2 == nil {
+		fmt.Println("Get From Cache")
+		orderItem := entity.OrderItem{}
+		err := json.Unmarshal([]byte(result), &orderItem)
+		if err != nil {
+			return orderItem, err
+		}
+
+		return orderItem, nil
+	}
+
 	var orderItem entity.OrderItem
 	err := initializers.DB.Where("deleted_at IS NULL").First(&orderItem, orderItemId).Error
 
@@ -45,6 +60,15 @@ func GetOrderItemById(orderItemId *int) (entity.OrderItem, error) {
 		return orderItem, err
 	}
 	fmt.Println(orderItem)
+	marshal, err2 := json.Marshal(orderItem)
+	if err2 != nil {
+		return orderItem, err2
+	}
+
+	err2 = initializers.Client.Set(initializers.Ctx, "orderItem_"+strconv.Itoa(*orderItemId), string(marshal), 30*time.Minute).Err()
+	if err2 != nil {
+		return orderItem, err2
+	}
 
 	return orderItem, nil
 }

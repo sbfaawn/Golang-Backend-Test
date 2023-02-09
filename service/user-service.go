@@ -4,7 +4,10 @@ import (
 	"Golang-Backend-Test/entity"
 	initializers "Golang-Backend-Test/initializer"
 	"Golang-Backend-Test/model/request"
+	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
 )
 
 func InsertUser(user *request.User) error {
@@ -37,6 +40,18 @@ func InsertUser(user *request.User) error {
 }
 
 func GetUserById(userId *int) (entity.User, error) {
+	result, err2 := initializers.Client.Get(initializers.Ctx, "user_"+strconv.Itoa(*userId)).Result()
+	if err2 == nil {
+		fmt.Println("Get From Cache")
+		user := entity.User{}
+		err := json.Unmarshal([]byte(result), &user)
+		if err != nil {
+			return user, err
+		}
+
+		return user, nil
+	}
+
 	var user entity.User
 	err := initializers.DB.Where("deleted_at IS NULL").First(&user, userId).Error
 
@@ -44,6 +59,15 @@ func GetUserById(userId *int) (entity.User, error) {
 		return user, err
 	}
 	fmt.Println(user)
+	marshal, err2 := json.Marshal(user)
+	if err2 != nil {
+		return user, err2
+	}
+
+	err2 = initializers.Client.Set(initializers.Ctx, "user_"+strconv.Itoa(*userId), string(marshal), 30*time.Minute).Err()
+	if err2 != nil {
+		return user, err2
+	}
 
 	return user, nil
 }
@@ -57,4 +81,14 @@ func GetUsers() ([]entity.User, error) {
 	}
 
 	return users, nil
+}
+
+func SoftDeleteUser(id *int) error {
+	now := time.Now().String()
+	err := initializers.DB.Model(&entity.User{}).Where("id = ?", id).Update("deleted_at", now).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
