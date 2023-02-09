@@ -37,16 +37,16 @@ func InsertOrderItem(order *request.OrderItem) error {
 	return nil
 }
 
-func GetOrderItemById(orderItemId *int) error {
+func GetOrderItemById(orderItemId *int) (entity.OrderItem, error) {
 	var orderItem entity.OrderItem
 	err := initializers.DB.Where("deleted_at IS NULL").First(&orderItem, orderItemId).Error
 
 	if err != nil {
-		return err
+		return orderItem, err
 	}
 	fmt.Println(orderItem)
 
-	return nil
+	return orderItem, nil
 }
 
 func GetOrderItems() ([]entity.OrderItem, error) {

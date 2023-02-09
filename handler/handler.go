@@ -7,6 +7,7 @@ import (
 	"Golang-Backend-Test/service"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 func HealthCheckHandler(c echo.Context) error {
@@ -83,7 +84,7 @@ func ListUsers(c echo.Context) error {
 	}
 
 	response := response2.Response{
-		Message: "Success to Retrieve data",
+		Message: "Success to Retrieve all data",
 		Data:    users,
 	}
 
@@ -97,7 +98,7 @@ func ListOrderItems(c echo.Context) error {
 	}
 
 	response := response2.Response{
-		Message: "Success to Retrieve data",
+		Message: "Success to Retrieve all data",
 		Data:    orderItems,
 	}
 
@@ -111,7 +112,7 @@ func ListOrderHistories(c echo.Context) error {
 	}
 
 	response := response2.Response{
-		Message: "Success to Retrieve data",
+		Message: "Success to Retrieve all data",
 		Data:    orderHistories,
 	}
 
@@ -119,17 +120,84 @@ func ListOrderHistories(c echo.Context) error {
 }
 
 // /
-func DetailHandler(c echo.Context) error {
-	response := response2.Response{Message: "Get Endpoint is Called"}
+func DetailUser(c echo.Context) error {
+	paramId := c.QueryParam("id")
+	idInt, err := strconv.Atoi(paramId)
+	if err != nil {
+		return err
+	}
+
+	user, err := service.GetUserById(&idInt)
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to Retrieve data with Id " + paramId,
+		Data:    user,
+	}
+
 	return c.JSON(http.StatusOK, response)
 }
 
+func DetailOrderItem(c echo.Context) error {
+	paramId := c.QueryParam("id")
+	idInt, err := strconv.Atoi(paramId)
+	if err != nil {
+		return err
+	}
+
+	orderItem, err := service.GetOrderItemById(&idInt)
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to Retrieve data with Id " + paramId,
+		Data:    orderItem,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func DetailOrderHistory(c echo.Context) error {
+	paramId := c.QueryParam("id")
+	idInt, err := strconv.Atoi(paramId)
+	if err != nil {
+		return err
+	}
+
+	orderHistory, err := service.GetOrderHistoriesById(&idInt)
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to Retrieve data with Id " + paramId,
+		Data:    orderHistory,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+// /
 func UpdateHandler(c echo.Context) error {
 	response := response2.Response{Message: "Update Endpoint is Called"}
 	return c.JSON(http.StatusOK, response)
 }
 
-func DeleteHandler(c echo.Context) error {
+// /
+func DeleteUser(c echo.Context) error {
+	response := response2.Response{Message: "Delete Endpoint is Called"}
+	return c.JSON(http.StatusOK, response)
+}
+
+func DeleteOrderItem(c echo.Context) error {
+	response := response2.Response{Message: "Delete Endpoint is Called"}
+	return c.JSON(http.StatusOK, response)
+}
+
+func DeleteOrderHistory(c echo.Context) error {
 	response := response2.Response{Message: "Delete Endpoint is Called"}
 	return c.JSON(http.StatusOK, response)
 }

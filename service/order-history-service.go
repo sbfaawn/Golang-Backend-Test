@@ -21,7 +21,7 @@ func InsertOrderHistory(orderHistory *request.OrderHistory) error {
 		return err
 	}
 
-	if err := GetOrderItemById(&orderHistory.OrderItemId); err != nil {
+	if _, err := GetOrderItemById(&orderHistory.OrderItemId); err != nil {
 		return err
 	}
 	// call db & insert
@@ -37,7 +37,7 @@ func InsertOrderHistory(orderHistory *request.OrderHistory) error {
 type OrderHistoryJoin struct {
 	FullName    string    `json:"fullName"`
 	FirstOrder  string    `json:"firstOrder"`
-	OrderName   string    `json:"orderName"`
+	OrderName   string    `json:"orderName" gorm:"column:name"`
 	Price       string    `json:"price"`
 	ExpiredAt   time.Time `json:"expiredAt"`
 	Description string    `json:"description"`
@@ -46,11 +46,25 @@ type OrderHistoryJoin struct {
 func GetOrderHistories() (OrderHistoryJoin, error) {
 	var result OrderHistoryJoin
 
-	err := initializers.DB.Table("order_histories").Select("users.full_name, users.first_order, order_items.name, order_items.price, order_items.expired_at, order_histories.description").Joins("JOIN order_items ON order_histories.order_item_id = order_items.id").Joins("JOIN users ON order_histories.user_id = users.id").Scan(&result).Error
+	err := initializers.DB.Table("order_histories").Where("users.deleted_at IS NULL").Where("order_items.deleted_at IS NULL").Select("users.full_name, users.first_order, order_items.name, order_items.price, order_items.expired_at, order_histories.description").Joins("JOIN order_items ON order_histories.order_item_id = order_items.id").Joins("JOIN users ON order_histories.user_id = users.id").Scan(&result).Error
+	fmt.Println(result)
+
 	if err != nil {
 		return result, err
 	}
 
 	return result, nil
+}
 
+func GetOrderHistoriesById(id *int) (OrderHistoryJoin, error) {
+	var result OrderHistoryJoin
+
+	err := initializers.DB.Table("order_histories").Where("order_histories.id = ?", id).Where("users.deleted_at IS NULL").Where("order_items.deleted_at IS NULL").Select("users.full_name, users.first_order, order_items.name, order_items.price, order_items.expired_at, order_histories.description").Joins("JOIN order_items ON order_histories.order_item_id = order_items.id").Joins("JOIN users ON order_histories.user_id = users.id").Scan(&result).Error
+	fmt.Println(result)
+
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
 }

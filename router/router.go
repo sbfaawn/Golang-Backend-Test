@@ -35,10 +35,15 @@ func NewRouter() *echo.Echo {
 	router.GET("/list-order-item", handler.ListOrderItems)
 	router.GET("/list-order-history", handler.ListOrderHistories)
 	//
-	router.GET("/detail", handler.DetailHandler)
-
+	router.GET("/detail-user", handler.DetailUser)
+	router.GET("/detail-order-item", handler.DetailOrderItem)
+	router.GET("/detail-order-history", handler.DetailOrderHistory)
+	//
 	router.PUT("/update", handler.UpdateHandler)
-	router.DELETE("/delete", handler.DeleteHandler)
+	//
+	router.DELETE("/delete-user", handler.DeleteUser)
+	router.DELETE("/delete-order-item", handler.DeleteOrderItem)
+	router.DELETE("/delete-order-history", handler.DeleteOrderHistory)
 
 	return e
 }
