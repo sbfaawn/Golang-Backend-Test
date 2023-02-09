@@ -19,7 +19,7 @@ func ConnectToRedis(config *Config) {
 
 	pong, err := Client.Ping(Ctx).Result()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("No Connection to Redis\n", err)
 	}
 
 	fmt.Println("Redis Connection is Established", pong)

@@ -1,8 +1,8 @@
 package main
 
 import (
+	"Golang-Backend-Test/entity"
 	initializers "Golang-Backend-Test/initializer"
-	"Golang-Backend-Test/model"
 	"fmt"
 	"log"
 )
@@ -18,6 +18,6 @@ func init() {
 }
 
 func main() {
-	initializers.DB.AutoMigrate(&model.OrderItem{}, &model.User{}, &model.OrderHistory{})
+	initializers.DB.AutoMigrate(&entity.OrderItem{}, &entity.User{}, &entity.OrderHistory{})
 	fmt.Println("Migration Complete")
 }
