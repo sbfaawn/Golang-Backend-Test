@@ -83,3 +83,35 @@ func GetOrderItems() ([]entity.OrderItem, error) {
 
 	return orderItems, nil
 }
+
+func SoftDeleteOrderItem(id *int) error {
+	user := entity.User{
+		Id: *id,
+	}
+
+	err := initializers.DB.Model(&user).Updates(map[string]interface{}{
+		"deleted_at": time.Now(),
+	}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateOrderItem(orderItem *request.OrderItem) (entity.OrderItem, error) {
+	entity := entity.OrderItem{
+		Id: *orderItem.Id,
+	}
+
+	err := initializers.DB.Model(&entity).Updates(map[string]interface{}{
+		"name":       orderItem.Name,
+		"price":      orderItem.Price,
+		"expired_at": orderItem.ExpiredAt,
+	}).Error
+	if err != nil {
+		return entity, err
+	}
+
+	return entity, nil
+}

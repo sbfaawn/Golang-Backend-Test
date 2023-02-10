@@ -5,6 +5,7 @@ import (
 	"Golang-Backend-Test/model/request"
 	response2 "Golang-Backend-Test/model/response"
 	"Golang-Backend-Test/service"
+	"errors"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"strconv"
@@ -181,8 +182,70 @@ func DetailOrderHistory(c echo.Context) error {
 }
 
 // /
-func UpdateHandler(c echo.Context) error {
-	response := response2.Response{Message: "Update Endpoint is Called"}
+func UpdateUser(c echo.Context) error {
+	o := new(request.User)
+	if err := c.Bind(o); err != nil {
+		return err
+	}
+
+	if o.Id == nil {
+		return errors.New("Id need to be specified in request")
+	}
+
+	user, err := service.UpdateUser(o)
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to update data with Id " + strconv.Itoa(*o.Id),
+		Data:    user,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func UpdateOrderItem(c echo.Context) error {
+	o := new(request.OrderItem)
+	if err := c.Bind(o); err != nil {
+		return err
+	}
+
+	if o.Id == nil {
+		return errors.New("Id need to be specified in request")
+	}
+
+	orderItem, err := service.UpdateOrderItem(o)
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to update data with Id " + strconv.Itoa(*o.Id),
+		Data:    orderItem,
+	}
+	return c.JSON(http.StatusOK, response)
+}
+
+func UpdateOrderHistory(c echo.Context) error {
+	o := new(request.OrderHistory)
+	if err := c.Bind(o); err != nil {
+		return err
+	}
+
+	if o.Id == nil {
+		return errors.New("Id need to be specified in request")
+	}
+
+	orderHistory, err := service.UpdateOrderHistory(o)
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to update data with Id " + strconv.Itoa(*o.Id),
+		Data:    orderHistory,
+	}
 	return c.JSON(http.StatusOK, response)
 }
 
@@ -207,11 +270,21 @@ func DeleteUser(c echo.Context) error {
 }
 
 func DeleteOrderItem(c echo.Context) error {
-	response := response2.Response{Message: "Delete Endpoint is Called"}
-	return c.JSON(http.StatusOK, response)
-}
+	paramId := c.QueryParam("id")
+	idInt, err := strconv.Atoi(paramId)
+	if err != nil {
+		return err
+	}
 
-func DeleteOrderHistory(c echo.Context) error {
-	response := response2.Response{Message: "Delete Endpoint is Called"}
+	err = service.SoftDeleteOrderItem(&idInt)
+	if err != nil {
+		return err
+	}
+
+	response := response2.Response{
+		Message: "Success to Delete data with Id " + paramId,
+		Data:    nil,
+	}
+
 	return c.JSON(http.StatusOK, response)
 }

@@ -91,3 +91,29 @@ func GetOrderHistoriesById(id *int) (OrderHistoryJoin, error) {
 
 	return result, nil
 }
+
+func UpdateOrderHistory(history *request.OrderHistory) (entity.OrderHistory, error) {
+	entity := entity.OrderHistory{
+		Id: *history.Id,
+	}
+
+	// validation
+	if _, err := GetUserById(&history.UserId); err != nil {
+		return entity, err
+	}
+
+	if _, err := GetOrderItemById(&history.OrderItemId); err != nil {
+		return entity, err
+	}
+
+	err := initializers.DB.Model(&entity).Updates(map[string]interface{}{
+		"user_id":       history.UserId,
+		"order_item_id": history.OrderItemId,
+		"description":   history.Description,
+	}).Error
+	if err != nil {
+		return entity, err
+	}
+
+	return entity, nil
+}

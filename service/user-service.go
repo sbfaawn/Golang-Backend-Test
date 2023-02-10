@@ -84,11 +84,32 @@ func GetUsers() ([]entity.User, error) {
 }
 
 func SoftDeleteUser(id *int) error {
-	now := time.Now().String()
-	err := initializers.DB.Model(&entity.User{}).Where("id = ?", id).Update("deleted_at", now).Error
+	user := entity.User{
+		Id: *id,
+	}
+
+	err := initializers.DB.Model(&user).Updates(map[string]interface{}{
+		"deleted_at": time.Now(),
+	}).Error
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func UpdateUser(user *request.User) (entity.User, error) {
+	entity := entity.User{
+		Id: *user.Id,
+	}
+
+	err := initializers.DB.Model(&entity).Updates(map[string]interface{}{
+		"full_name":   user.FullName,
+		"first_order": user.FirstOrder,
+	}).Error
+	if err != nil {
+		return entity, err
+	}
+
+	return entity, nil
 }
